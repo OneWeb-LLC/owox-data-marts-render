@@ -151,16 +151,15 @@ Invite teammates via `/auth` ([Better Auth members guide](../setup-guide/members
 | Report runs RESTRICTED | Missing/invalid license | Add `LICENSE_KEY` for `PUBLIC_ORIGIN` |
 | Blank UI | `PUBLIC_ORIGIN` mismatch | Must exactly match the browser URL (scheme + host) |
 
-## One OS sign-in (preview)
+## One OS sign-in (OWeb constellation)
 
-When One OS (Supabase) should own sign-in:
+Do **not** send users to another satellite (e.g. `artemiis.one`). Use the **OWeb control plane**:
 
-1. Set `IDP_PROVIDER=one-os` and configure [`@owox/idp-one-os`](../../../packages/idp-one-os/README.md) variables.
-2. Set `IDP_ONE_OS_SIGN_IN_URL` to your One OS login page.
-3. Configure One OS to redirect after login to  
-   `{PUBLIC_ORIGIN}/auth/one-os/callback?access_token=<supabase_access_token>`.
-4. Map workspaces: `IDP_ONE_OS_WORKSPACE_PROJECT_MAP='{"<workspace-uuid>":"0"}'`.
-5. Plan cutover from Better Auth (export users or re-invite).
+1. Set `IDP_PROVIDER=one-os` and [`@owox/idp-one-os`](../../../packages/idp-one-os/README.md) variables.
+2. Set `IDP_ONE_OS_SIGN_IN_URL=https://oweb.one/login` and `IDP_ONE_OS_ECOSYSTEM_APP_ID=ometrics`.
+3. In OWeb `ecosystem-apps.ts`, set `ometrics.launchUrl` to your satellite URL (e.g. `https://ometrics.onrender.com`) so App Store SSO returns to `/auth/sso?launch_token=…`.
+4. Map workspaces via `IDP_ONE_OS_WORKSPACE_PROJECT_MAP` or the Phase C activation API.
 
-Member invites and workspace activation UI remain Phase C — see
-[oweb-satellite-one-os.md](../../architecture/oweb-satellite-one-os.md).
+**oMetrics:** `/auth/sign-in` must 302 to `https://oweb.one/login?launch=ometrics` (not `artemiis.one`).
+
+See OWeb [SATELLITE_AUTH_RETURN](https://github.com/OneWeb-LLC/oweb/blob/main/docs/SATELLITE_AUTH_RETURN.md). Workspace activation: [one-os-workspace-activation-spec.md](../../architecture/one-os-workspace-activation-spec.md).
