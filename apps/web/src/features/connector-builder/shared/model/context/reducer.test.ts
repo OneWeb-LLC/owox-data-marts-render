@@ -120,8 +120,14 @@ describe('builderReducer', () => {
     });
     const saved = edited.manifest;
 
+    const savedState = builderReducer(edited, {
+      type: BuilderActionType.MARK_SAVED,
+      payload: saved,
+    });
+    expect(savedState.dirty).toBe(false);
+    expect(savedState.manifest.title).toBe('Saved');
     expect(
-      builderReducer(edited, { type: BuilderActionType.MARK_SAVED, payload: saved }).dirty
+      builderReducer(savedState, { type: BuilderActionType.MARK_SAVED, payload: saved }).dirty
     ).toBe(false);
 
     const editedDuringSave = builderReducer(edited, {

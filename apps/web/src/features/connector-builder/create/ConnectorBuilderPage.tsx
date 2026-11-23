@@ -258,9 +258,9 @@ function BuilderShell({
       />
 
       {/* Body: left config column + work area (form region above results dock) */}
-      <div className='flex min-h-0 flex-1'>
+      <div className='flex min-h-0 flex-1 flex-col md:flex-row'>
         {mode === 'builder' && (
-          <div className='flex w-[236px] shrink-0 flex-col border-r'>
+          <div className='flex max-h-[38vh] w-full shrink-0 flex-col border-b md:max-h-none md:w-[236px] md:border-r md:border-b-0'>
             {/* Builder / Code switch sits above the configuration tree */}
             <BuilderModeTabs mode={mode} onSetMode={requestMode} />
             <div className='min-h-0 flex-1 overflow-y-auto'>

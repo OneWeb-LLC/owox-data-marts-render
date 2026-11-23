@@ -88,7 +88,7 @@ export function BuilderTopBar({
 
   return (
     <div
-      className='bg-card relative flex h-[52px] flex-none items-center gap-2.5 border-b pr-4 pl-2.5'
+      className='bg-card relative flex h-[52px] min-w-0 flex-none items-center gap-1.5 overflow-x-auto border-b pr-3 pl-2'
       data-testid='builder-topbar'
     >
       {onBack && (
@@ -108,7 +108,7 @@ export function BuilderTopBar({
       <div className='ml-1 flex items-center gap-1.5 text-[13px]'>
         <span className='text-muted-foreground'>Connectors</span>
         <ChevronRight className='text-muted-foreground h-3.5 w-3.5' />
-        <span className='text-foreground max-w-[200px] truncate font-medium'>
+        <span className='text-foreground max-w-[8rem] truncate font-medium sm:max-w-[200px]'>
           {manifest.name || 'New connector'}
         </span>
       </div>
@@ -124,7 +124,7 @@ export function BuilderTopBar({
       )}
 
       {/* Right group */}
-      <div className='ml-auto flex items-center gap-2.5'>
+      <div className='ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2.5'>
         <Button
           variant='ghost'
           onClick={onToggleTest}

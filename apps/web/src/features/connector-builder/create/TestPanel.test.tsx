@@ -35,7 +35,7 @@ function testSettingsKeys(): string[] {
  * with the result the mocked `test` call produced. */
 async function runTestOnOneNode() {
   render(<ConnectorBuilderPage />);
-  fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+  fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
   fireEvent.change(screen.getByPlaceholderText('Node name'), { target: { value: 'items' } });
   fireEvent.click(screen.getByRole('button', { name: /add node/i }));
 
@@ -65,7 +65,7 @@ describe('Builder TestPanel flow', () => {
 
   it('runs a test with the in-editor manifest + parameter values and renders the rows', async () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
 
     fireEvent.click(screen.getByText('Parameters'));
     addParameter('Token');
@@ -99,7 +99,7 @@ describe('Builder TestPanel flow', () => {
 
   it('switches the result view between table, JSON, and logs (default table)', async () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
     fireEvent.change(screen.getByPlaceholderText('Node name'), { target: { value: 'items' } });
     fireEvent.click(screen.getByRole('button', { name: /add node/i }));
 
@@ -128,7 +128,7 @@ describe('Builder TestPanel flow', () => {
       error: null,
     });
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
     fireEvent.change(screen.getByPlaceholderText('Node name'), { target: { value: 'items' } });
     fireEvent.click(screen.getByRole('button', { name: /add node/i }));
 
@@ -222,7 +222,7 @@ describe('test settings persistence', () => {
   /** A connector with one SECRET parameter, one ordinary one, and a node to test. */
   function buildConnector() {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
 
     fireEvent.click(screen.getByText('Parameters'));
     addParameter('Token');
@@ -262,7 +262,7 @@ describe('test settings persistence', () => {
   // SECRET; the parser marks it only when the manifest is saved.
   it('never writes a value the authentication uses to this device, SECRET or not', async () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
     fireEvent.click(screen.getByText('Parameters'));
     addParameter('Token');
     addParameter('Region');
@@ -304,7 +304,7 @@ describe('test settings persistence', () => {
     );
     test.mockResolvedValue({ rows: [], logs: [], error: null });
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
     fireEvent.click(screen.getByText('Parameters'));
     addParameter('GeneratedRefreshToken');
     addParameter('Region');

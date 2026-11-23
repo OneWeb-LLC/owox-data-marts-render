@@ -15,6 +15,7 @@ import {
   CollapsibleCardFooter,
 } from '../../../../shared/components/CollapsibleCard';
 import { useBuilder } from '../../shared/model/hooks/useBuilder';
+import { connectorNameProblem } from '../../shared/model/manifestNames';
 import { InfoLabel } from './fields';
 import { AdvancedSettingsEditor } from './AdvancedSettingsEditor';
 
@@ -51,6 +52,10 @@ export function GeneralEditor() {
   //
   // The fields beside it are display-only and DO save: saveDraft syncs them onto the row.
   const nameLocked = state.id !== null;
+  const nameProblem = connectorNameProblem(manifest.name);
+  const showNameProblem =
+    nameProblem !== null && (manifest.name.trim() !== '' || state.error === nameProblem);
+  const examplePlaceholder = 'placeholder:text-muted-foreground/55 placeholder:italic';
   return (
     <div className='flex flex-col gap-4 px-6 py-[18px]' data-testid='general-editor'>
       <CollapsibleCard collapsible name='connector-general'>
@@ -76,10 +81,18 @@ export function GeneralEditor() {
                 onChange={e => {
                   setPath(['name'], e.target.value);
                 }}
-                placeholder='MyCustomApi'
+                placeholder='e.g. MyCustomApi'
                 readOnly={nameLocked}
-                className={nameLocked ? 'text-muted-foreground' : undefined}
+                aria-invalid={showNameProblem || undefined}
+                className={
+                  nameLocked ? `text-muted-foreground ${examplePlaceholder}` : examplePlaceholder
+                }
               />
+              {showNameProblem && (
+                <p className='text-destructive mt-1 text-xs' role='alert'>
+                  {nameProblem}
+                </p>
+              )}
             </label>
             <label className='flex flex-col'>
               <InfoLabel hint='Friendly display name shown across the product — in connector lists, pickers and data marts. Spaces and capitalization are fine, e.g. My Custom API.'>
@@ -90,8 +103,14 @@ export function GeneralEditor() {
                 onChange={e => {
                   setPath(['title'], e.target.value);
                 }}
-                placeholder='My Custom API'
+                placeholder='e.g. My Custom API'
+                className={examplePlaceholder}
               />
+              {!(manifest.title ?? '').trim() && (
+                <p className='text-muted-foreground mt-1 text-xs'>
+                  Shown in lists. Leave blank to use the name.
+                </p>
+              )}
             </label>
             <label className='flex flex-col'>
               <InfoLabel hint='Root address every request starts from. Each node’s path is appended to it, so omit the trailing slash, e.g. https://api.example.com.'>
@@ -102,8 +121,8 @@ export function GeneralEditor() {
                 onChange={e => {
                   setPath(['baseUrl'], e.target.value);
                 }}
-                placeholder='https://api.example.com'
-                className='font-mono'
+                placeholder='e.g. https://api.example.com'
+                className={`font-mono ${examplePlaceholder}`}
               />
             </label>
             <label className='flex flex-col'>
@@ -115,8 +134,8 @@ export function GeneralEditor() {
                 onChange={e => {
                   setPath(['docUrl'], e.target.value);
                 }}
-                placeholder='https://example.com/docs'
-                className='font-mono'
+                placeholder='e.g. https://example.com/docs'
+                className={`font-mono ${examplePlaceholder}`}
               />
             </label>
             <div className='flex flex-col sm:col-span-2'>

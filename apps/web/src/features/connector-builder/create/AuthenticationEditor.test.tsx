@@ -35,7 +35,7 @@ describe('Builder Authentication flow', () => {
 
   it('configures bearer auth and inserts a parameter into the format, saved in the manifest', async () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
 
     fireEvent.click(screen.getByText('Parameters'));
     addParameter('Token');
@@ -70,7 +70,7 @@ describe('Builder Authentication flow', () => {
 
   it('None clears the authentication block', async () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
     fireEvent.click(screen.getByText('Authentication'));
     fireEvent.click(screen.getByRole('button', { name: 'API Key' }));
     fireEvent.click(screen.getByRole('button', { name: 'None' }));
@@ -83,7 +83,7 @@ describe('Builder Authentication flow', () => {
 
   it('configures tokenExchange with url, tokenPath and body, saved in the manifest', async () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
 
     fireEvent.click(screen.getByText('Authentication'));
     fireEvent.click(screen.getByRole('button', { name: 'Token Exchange' }));
@@ -112,7 +112,7 @@ describe('Builder Authentication flow', () => {
 
   it('renders the oauth2 editor and writes the token URL into the manifest', async () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
 
     fireEvent.click(screen.getByText('Authentication'));
     fireEvent.click(screen.getByRole('button', { name: 'OAuth2' }));
@@ -139,7 +139,7 @@ describe('Builder Authentication flow', () => {
 
   it('configures apiKey auth and edits the inject name, saved in the manifest', async () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
 
     fireEvent.click(screen.getByText('Authentication'));
     fireEvent.click(screen.getByRole('button', { name: 'API Key' }));
@@ -161,7 +161,7 @@ describe('Builder Authentication flow', () => {
 
   it('configures basic auth (username/password), hides inject fields, saved in the manifest', async () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
 
     fireEvent.click(screen.getByText('Authentication'));
     fireEvent.click(screen.getByRole('button', { name: 'Basic' }));
@@ -188,7 +188,7 @@ describe('Builder Authentication flow', () => {
 
   it('clicking the already-selected auth type again keeps the block the author filled in', async () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
 
     fireEvent.click(screen.getByText('Authentication'));
     fireEvent.click(screen.getByRole('button', { name: 'OAuth2' }));
@@ -213,7 +213,7 @@ describe('Builder Authentication flow', () => {
 
   it('configures selective auth with a selection parameter and an apiKey branch, saved in the manifest', async () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
 
     fireEvent.click(screen.getByText('Authentication'));
     fireEvent.click(screen.getByRole('button', { name: 'Selective' }));
@@ -238,7 +238,7 @@ describe('Builder Authentication flow', () => {
 
   it('selective auth: removing a branch does not crash the editor and omits the removed key from the manifest', async () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
 
     fireEvent.click(screen.getByText('Authentication'));
     fireEvent.click(screen.getByRole('button', { name: 'Selective' }));

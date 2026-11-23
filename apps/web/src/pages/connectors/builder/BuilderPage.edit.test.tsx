@@ -156,7 +156,7 @@ describe('ConnectorBuilderRoutePage — an existing connector', () => {
       await waitFor(() => {
         expect(getVersion).toHaveBeenCalled();
       });
-      fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), {
+      fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), {
         target: { value: 'Renamed' },
       });
       return router;
@@ -318,10 +318,10 @@ describe('ConnectorBuilderRoutePage — AI assistant promo on a saved connector'
     renderRoute('/connectors/builder/def-1?test=items');
 
     await waitFor(() => {
-      expect(screen.getByPlaceholderText('MyCustomApi')).toHaveValue('MyApi');
+      expect(screen.getByPlaceholderText('e.g. MyCustomApi')).toHaveValue('MyApi');
     });
     expect(screen.getByTestId('builder-scroll-pane').firstElementChild).toContainElement(
-      screen.getByPlaceholderText('MyCustomApi')
+      screen.getByPlaceholderText('e.g. MyCustomApi')
     );
     expect(screen.queryByText(PROMO_TITLE)).toBeNull();
   });
@@ -332,10 +332,10 @@ describe('ConnectorBuilderRoutePage — AI assistant promo on a saved connector'
     renderRoute();
 
     await waitFor(() => {
-      expect(screen.getByPlaceholderText('MyCustomApi')).toHaveValue('MyApi');
+      expect(screen.getByPlaceholderText('e.g. MyCustomApi')).toHaveValue('MyApi');
     });
     expect(screen.getByTestId('builder-scroll-pane').firstElementChild).toContainElement(
-      screen.getByPlaceholderText('MyCustomApi')
+      screen.getByPlaceholderText('e.g. MyCustomApi')
     );
     expect(screen.queryByText(PROMO_TITLE)).toBeNull();
   });

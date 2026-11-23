@@ -67,8 +67,34 @@ export function builderReducer(state: BuilderState, action: BuilderAction): Buil
     // Clean only while the builder still holds what was saved: an edit made while the save
     // was in flight is in the state but not on the server.
     case BuilderActionType.MARK_SAVED: {
-      const clean = state.manifest === action.payload && state.logo === state.savedLogo;
-      return { ...state, savedManifest: action.payload, dirty: state.dirty && !clean };
+      const payload = action.payload;
+      const payloadTitle = (payload.title ?? '').trim();
+      const payloadName = payload.name.trim();
+      const displayedTitle = payloadTitle || payloadName;
+      // Create saves twice: the first pass writes the blank title as the name, the
+      // second repeats the original manifest after the version list loads. That
+      // second pass must not treat the filled title as a newer unsaved edit.
+      if (
+        state.manifest === state.savedManifest &&
+        state.manifest !== payload &&
+        state.manifest.name === payload.name &&
+        (state.manifest.title ?? '') === displayedTitle &&
+        state.logo === state.savedLogo
+      ) {
+        return { ...state, dirty: false };
+      }
+      const unchanged = state.manifest === payload;
+      // A blank title is stored as the name. Write that into the open form only when
+      // nothing newer arrived during the save, so an in-flight edit is not replaced.
+      const stored =
+        unchanged && !payloadTitle && payloadName ? { ...payload, title: payloadName } : payload;
+      const clean = unchanged && state.logo === state.savedLogo;
+      return {
+        ...state,
+        manifest: unchanged ? stored : state.manifest,
+        savedManifest: stored,
+        dirty: state.dirty && !clean,
+      };
     }
     case BuilderActionType.SET_LOGO:
       return { ...state, logo: action.payload, dirty: true };
