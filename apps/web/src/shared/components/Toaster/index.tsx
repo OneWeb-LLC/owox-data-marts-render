@@ -3,15 +3,16 @@ import { Toaster as HotToaster } from 'react-hot-toast';
 export function Toaster() {
   return (
     <HotToaster
-      position='top-right'
-      containerStyle={{ top: 16, right: 16 }}
+      // Below the header, so Publish and a sheet's close button stay clickable.
+      position='bottom-center'
+      containerStyle={{ bottom: 24, left: 16, right: 16 }}
       toastOptions={{
         duration: 3000,
         style: {
           borderRadius: '32px',
           boxShadow: 'none',
           padding: '0.4rem 1rem',
-          maxWidth: '800px',
+          maxWidth: '28rem',
           fontSize: '0.875rem',
           borderBottomWidth: '1px',
           borderBottomStyle: 'solid',
