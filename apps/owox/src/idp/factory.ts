@@ -4,6 +4,7 @@ import {
   MySqlConfig,
   SqliteConfig,
 } from '@owox/idp-better-auth';
+import { loadOneOsIdpConfigFromEnv, OneOsIdpProvider } from '@owox/idp-one-os';
 import { loadBetterAuthProviderConfigFromEnv, OwoxBetterAuthIdp } from '@owox/idp-owox-better-auth';
 import { IdpConfig, IdpProvider, NullIdpProvider } from '@owox/idp-protocol';
 import { parseMysqlSslEnv } from '@owox/internal-helpers';
@@ -14,6 +15,7 @@ import { resolvePublicOrigin } from '../utils/public-origin.js';
 export enum IdpProviderType {
   BetterAuth = 'better-auth',
   None = 'none',
+  OneOs = 'one-os',
   OwoxBetterAuth = 'owox-better-auth',
 }
 
@@ -56,6 +58,10 @@ export class IdpFactory {
 
       case IdpProviderType.OwoxBetterAuth: {
         return this.createOwoxBetterAuthProvider(command);
+      }
+
+      case IdpProviderType.OneOs: {
+        return this.createOneOsProvider();
       }
 
       default: {
@@ -177,6 +183,11 @@ export class IdpFactory {
    * @param {BaseCommand} command - Command instance for logging and exiting with an error.
    * @returns {Promise<OwoxBetterAuthIdp>} Promise resolving to an initialized OwoxBetterAuth provider.
    */
+  private static createOneOsProvider(): OneOsIdpProvider {
+    const config = loadOneOsIdpConfigFromEnv();
+    return new OneOsIdpProvider(config);
+  }
+
   private static async createOwoxBetterAuthProvider(
     command: BaseCommand
   ): Promise<OwoxBetterAuthIdp> {

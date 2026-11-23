@@ -68,7 +68,7 @@ warehouse.
 | `DB_TYPE=mysql` for app DB | Yes (MySQL **outside** Render; see [DigitalOcean](../getting-started/deployment-guide/digitalocean.md) pattern) |
 | Schedules in the same service as the API | Yes (`SCHEDULER_EXECUTION_ENABLED`; avoid multiple instances without a distributed runner) |
 | BigQuery (and other listed storages) for marketing data | Yes |
-| Supabase / One OS as `IdpProvider` | **No** — requires new package implementing [`IdpProvider`](../../packages/idp-protocol/src/types/provider.ts) |
+| Supabase / One OS as `IdpProvider` | **Preview** — `IDP_PROVIDER=one-os` ([`@owox/idp-one-os`](../../packages/idp-one-os/)); member admin + activation still Phase C |
 | “Activate OWOX for workspace X” in One OS | **No** — product workflow + mapping store |
 | Render Managed Postgres as OWOX `DB_TYPE` | **No** — OWOX app DB is SQLite or MySQL |
 
@@ -92,6 +92,10 @@ Better Auth; app DB on external MySQL (or SQLite on disk for early pilots).
 Operational detail: [Render Oweb satellite](../getting-started/deployment-guide/render-oweb-satellite.md).
 
 ### Phase B — One OS identity bridge (engineering)
+
+**Preview (in repo):** `IDP_PROVIDER=one-os` via [`@owox/idp-one-os`](../../packages/idp-one-os/).
+Supabase JWT callback, session cookie, workspace → project mapping. Member admin and
+activation API remain Phase C.
 
 **Outcome:** Sign-in through Supabase; OWOX issues and accepts tokens via a new
 `IdpProvider`; no parallel Better Auth user directory.
