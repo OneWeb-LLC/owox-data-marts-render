@@ -149,8 +149,16 @@ Invite teammates via `/auth` ([Better Auth members guide](../setup-guide/members
 | Report runs RESTRICTED | Missing/invalid license | Add `LICENSE_KEY` for `PUBLIC_ORIGIN` |
 | Blank UI | `PUBLIC_ORIGIN` mismatch | Must exactly match the browser URL (scheme + host) |
 
-## Next: One OS sign-in (not in core yet)
+## One OS sign-in (preview)
 
-When Supabase owns sign-in, replace `IDP_PROVIDER=better-auth` with a future
-One OS provider, implement workspace ↔ project mapping, and plan user cutover.
-Track architecture in [oweb-satellite-one-os.md](../../architecture/oweb-satellite-one-os.md).
+When One OS (Supabase) should own sign-in:
+
+1. Set `IDP_PROVIDER=one-os` and configure [`@owox/idp-one-os`](../../../packages/idp-one-os/README.md) variables.
+2. Set `IDP_ONE_OS_SIGN_IN_URL` to your One OS login page.
+3. Configure One OS to redirect after login to  
+   `{PUBLIC_ORIGIN}/auth/one-os/callback?access_token=<supabase_access_token>`.
+4. Map workspaces: `IDP_ONE_OS_WORKSPACE_PROJECT_MAP='{"<workspace-uuid>":"0"}'`.
+5. Plan cutover from Better Auth (export users or re-invite).
+
+Member invites and workspace activation UI remain Phase C — see
+[oweb-satellite-one-os.md](../../architecture/oweb-satellite-one-os.md).
