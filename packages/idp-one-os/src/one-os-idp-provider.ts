@@ -33,6 +33,10 @@ import type { OneOsIdpConfig } from './config/load-one-os-config.js';
 import { OneOsSessionStore } from './session/session-store.js';
 import { readClaimPath, verifySupabaseAccessToken } from './supabase/verify-supabase-jwt.js';
 import { signAccessToken, verifyAccessToken } from './tokens/access-token.js';
+import {
+  buildOwebConstellationSignInUrl,
+  redeemOwebLaunchToken,
+} from './ecosystem/redeem-launch-token.js';
 import { WorkspaceBindingStore } from './workspace/workspace-binding-store.js';
 import express from 'express';
 
@@ -53,6 +57,10 @@ export class OneOsIdpProvider implements IdpProvider {
   registerRoutes(app: Express): void {
     app.get('/auth/one-os/callback', (req, res) => {
       void this.handleCallback(req, res);
+    });
+
+    app.get('/auth/sso', (req, res) => {
+      void this.handleSsoLaunch(req, res);
     });
 
     const internal = express.Router();
@@ -110,6 +118,14 @@ export class OneOsIdpProvider implements IdpProvider {
   }
 
   async signInMiddleware(req: Request, res: Response, _next: NextFunction): Promise<void | Response> {
+    if (this.config.ecosystemAppId) {
+      const target = buildOwebConstellationSignInUrl(
+        this.config.signInUrl,
+        this.config.ecosystemAppId
+      );
+      return res.redirect(target);
+    }
+
     const callback = new URL('/auth/one-os/callback', this.config.baseUrl).toString();
     const target = new URL(this.config.signInUrl);
     if (!target.searchParams.has('redirect_to') && !target.searchParams.has('next')) {
@@ -412,6 +428,35 @@ export class OneOsIdpProvider implements IdpProvider {
     throw new IdpOperationNotSupportedError('createNewProject');
   }
 
+  private async handleSsoLaunch(req: Request, res: Response): Promise<void> {
+    const appId = this.config.ecosystemAppId;
+    if (!appId) {
+      res.status(503).send('Constellation SSO is not configured (IDP_ONE_OS_ECOSYSTEM_APP_ID)');
+      return;
+    }
+
+    const launchToken =
+      (typeof req.query.launch_token === 'string' && req.query.launch_token) ||
+      (typeof req.query.token === 'string' && req.query.token);
+
+    if (!launchToken) {
+      res.status(400).send('Missing launch_token');
+      return;
+    }
+
+    try {
+      const redeemed = await redeemOwebLaunchToken(
+        this.config.owebControlPlaneUrl,
+        appId,
+        launchToken
+      );
+      await this.establishSessionFromAccessToken(req, res, redeemed.accessToken);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'SSO redeem failed';
+      res.status(401).send(message);
+    }
+  }
+
   private async handleCallback(req: Request, res: Response): Promise<void> {
     const token =
       (typeof req.query.access_token === 'string' && req.query.access_token) ||
@@ -424,34 +469,42 @@ export class OneOsIdpProvider implements IdpProvider {
     }
 
     try {
-      const verified = await verifySupabaseAccessToken(
-        token,
-        this.config.supabaseUrl,
-        this.config.supabaseJwtSecret
-      );
-      const payload = this.payloadFromSupabaseClaims(
-        verified.userId,
-        verified.email,
-        verified.claims
-      );
-      const sessionId = this.sessions.create(payload);
-      const isSecure = this.isSecureRequest(req);
-      res.cookie(SESSION_COOKIE, sessionId, {
-        httpOnly: true,
-        secure: isSecure,
-        sameSite: 'lax',
-        maxAge: this.config.sessionCookieMaxAgeMs,
-      });
-
-      const redirect =
-        typeof req.query.redirect === 'string' && req.query.redirect.startsWith('/')
-          ? req.query.redirect
-          : '/';
-      res.redirect(redirect);
+      await this.establishSessionFromAccessToken(req, res, token);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Invalid token';
       res.status(401).send(message);
     }
+  }
+
+  private async establishSessionFromAccessToken(
+    req: Request,
+    res: Response,
+    accessToken: string
+  ): Promise<void> {
+    const verified = await verifySupabaseAccessToken(
+      accessToken,
+      this.config.supabaseUrl,
+      this.config.supabaseJwtSecret
+    );
+    const payload = this.payloadFromSupabaseClaims(
+      verified.userId,
+      verified.email,
+      verified.claims
+    );
+    const sessionId = this.sessions.create(payload);
+    const isSecure = this.isSecureRequest(req);
+    res.cookie(SESSION_COOKIE, sessionId, {
+      httpOnly: true,
+      secure: isSecure,
+      sameSite: 'lax',
+      maxAge: this.config.sessionCookieMaxAgeMs,
+    });
+
+    const redirect =
+      typeof req.query.redirect === 'string' && req.query.redirect.startsWith('/')
+        ? req.query.redirect
+        : '/';
+    res.redirect(redirect);
   }
 
   private payloadFromSupabaseClaims(

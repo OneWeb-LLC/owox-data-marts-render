@@ -28,6 +28,13 @@ export interface OneOsIdpConfig {
   activationSecret?: string;
   /** JSON file path for workspace ↔ project bindings (Phase C). */
   bindingsFilePath: string;
+  /**
+   * OWeb constellation `app_id` (e.g. `ometrics`). When set, sign-in uses
+   * `?launch=` on the control plane and `/auth/sso` redeems launch tokens.
+   */
+  ecosystemAppId?: string;
+  /** OWeb control plane origin for SSO redeem (default https://oweb.one). */
+  owebControlPlaneUrl: string;
 }
 
 function parseRole(value: string | undefined, fallback: Role): Role {
@@ -100,5 +107,11 @@ export function loadOneOsIdpConfigFromEnv(env: NodeJS.ProcessEnv = process.env):
         ? (env.IDP_ONE_OS_ACTIVATION_SECRET ?? '').trim()
         : undefined,
     bindingsFilePath: (env.IDP_ONE_OS_BINDINGS_FILE ?? '').trim(),
+    ecosystemAppId: (env.IDP_ONE_OS_ECOSYSTEM_APP_ID ?? '').trim() || undefined,
+    owebControlPlaneUrl: (
+      env.IDP_ONE_OS_OWEB_CONTROL_PLANE_URL ??
+      env.OWEB_CONTROL_PLANE_URL ??
+      'https://oweb.one'
+    ).replace(/\/$/, ''),
   };
 }
