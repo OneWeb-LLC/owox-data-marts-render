@@ -10,8 +10,22 @@
   session cookie.
 - Issues OWOX API access tokens for the React app (`/auth/access-token`).
 - Maps `app_metadata.workspace_id` → OWOX `projectId` via `IDP_ONE_OS_WORKSPACE_PROJECT_MAP`.
+- **Phase C:** workspace activation API persists bindings on disk; see below.
 - Member invites, MCP OAuth, and Better Auth–style user admin are **not** implemented — manage
-  users in One OS; manage project membership in Phase C.
+  users in One OS.
+
+## Workspace activation (Phase C)
+
+Requires `IDP_ONE_OS_ACTIVATION_SECRET` (≥32 chars). One OS backend calls (Bearer token):
+
+| Method | Path | Purpose |
+| ------ | ---- | ------- |
+| `POST` | `/internal/one-os/workspaces/activate` | Body `{ workspaceId, projectId?, projectTitle? }` |
+| `GET` | `/internal/one-os/workspaces/:workspaceId/binding` | Resolve deep link |
+| `DELETE` | `/internal/one-os/workspaces/:workspaceId` | Suspend |
+
+Bindings file: `IDP_ONE_OS_BINDINGS_FILE` or `<data>/one-os-workspace-bindings.json` (use Render
+disk mount for persistence).
 
 ## Configuration
 
