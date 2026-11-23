@@ -295,6 +295,11 @@ describe('ConsumerCredentialField', () => {
     expect((await openOptions()).map(option => option.textContent)).toEqual([
       '+ Create new Credential',
     ]);
+    expect(
+      screen.getByText(
+        'Open the list and choose Create new Credential. It is selected here when you save it.'
+      )
+    ).toBeInTheDocument();
   });
 
   it('says the list failed instead of offering a first Credential, and picks one once it loads', () => {

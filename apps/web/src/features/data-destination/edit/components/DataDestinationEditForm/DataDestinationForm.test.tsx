@@ -433,6 +433,40 @@ describe('DataDestinationForm', () => {
     }
   );
 
+  it.each([DataDestinationType.EMAIL, DataDestinationType.SLACK, DataDestinationType.MS_TEAMS])(
+    'explains an empty %s address list instead of a schema error',
+    async type => {
+      const { onSubmit } = renderForm(
+        { title: 'Recipients', type, credentials: { to: [] as string[] } } as DataDestination,
+        false
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+      expect(await screen.findByText('Add at least one email address')).toBeInTheDocument();
+      expect(screen.queryByText(/expected array/i)).not.toBeInTheDocument();
+      expect(onSubmit).not.toHaveBeenCalled();
+    }
+  );
+
+  it('names an email address that is not valid', async () => {
+    const { onSubmit } = renderForm(
+      {
+        title: 'Recipients',
+        type: DataDestinationType.EMAIL,
+        credentials: { to: ['not-an-email'] },
+      } as DataDestination,
+      false
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+    expect(
+      await screen.findByText('"not-an-email" is not a valid email address')
+    ).toBeInTheDocument();
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
   it('renders the promo right under the form actions when creating', () => {
     render(
       <DataDestinationForm

@@ -199,6 +199,11 @@ export function CredentialSelectField({
         }}
       />
       {keepsBinding && renderStateMark?.(summary)}
+      {items.length === 0 && !isLoading && !isError && (
+        <p className='text-muted-foreground text-sm'>
+          Open the list and choose Create new Credential. It is selected here when you save it.
+        </p>
+      )}
       {isError && (
         <div role='alert' className='flex items-center gap-3 text-sm'>
           <span className='text-muted-foreground'>Could not load Credentials.</span>

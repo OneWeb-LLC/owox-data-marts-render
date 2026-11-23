@@ -107,7 +107,9 @@ describe('syncOwners', () => {
         idpProjectionsFacade as never,
         createOwner
       )
-    ).rejects.toThrow(BadRequestException);
+    ).rejects.toThrow(
+      'The selected owner is not a member of this project. Choose a current member, or clear Ownership.'
+    );
 
     expect(repository.delete).not.toHaveBeenCalled();
     expect(repository.save).not.toHaveBeenCalled();

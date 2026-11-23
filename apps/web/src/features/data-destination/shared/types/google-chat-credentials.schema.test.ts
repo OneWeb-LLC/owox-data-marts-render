@@ -21,8 +21,28 @@ describe('googleChatCredentialsSchema', () => {
   });
 
   it('rejects email delivery without recipients', () => {
-    expect(googleChatCredentialsSchema.safeParse({ deliveryMethod: 'email', to: [] }).success).toBe(
-      false
-    );
+    const result = googleChatCredentialsSchema.safeParse({ deliveryMethod: 'email', to: [] });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.map(issue => issue.message)).toContain(
+        'Enter at least one Google Chat channel email'
+      );
+    }
+  });
+
+  it('names an invalid channel email on the list', () => {
+    const result = googleChatCredentialsSchema.safeParse({
+      deliveryMethod: 'email',
+      to: ['not-an-email'],
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues).toEqual([
+        expect.objectContaining({
+          path: ['to'],
+          message: '"not-an-email" is not a valid email address',
+        }),
+      ]);
+    }
   });
 });
