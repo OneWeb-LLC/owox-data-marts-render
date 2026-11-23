@@ -1,4 +1,24 @@
-# The image installs only the tarballs packed into docker-packages/, so nothing
-# else belongs in the build context -- node_modules alone would be gigabytes.
-*
-!docker-packages
+# Keep the build context lean, but include the monorepo source so hosts like Render
+# can pack workspaces during the image build. Pre-packed docker-packages/ on CI is
+# optional and is regenerated in the packer stage when absent.
+.git
+.github
+.cursor
+.claude
+.codex
+.husky
+docs
+node_modules
+**/node_modules
+**/dist
+**/coverage
+**/playwright-report
+**/test-results
+# When CI packs first, include docker-packages/ and its *.tgz files in the context.
+*.tgz
+!docker-packages/*.tgz
+.env
+.env.*
+!.env.example
+**/*.log
+.DS_Store
