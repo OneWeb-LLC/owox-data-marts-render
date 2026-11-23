@@ -1,4 +1,7 @@
 import { z } from 'zod';
+import { emailListIssue } from './email-list';
+
+const EMPTY_CHANNEL_LIST = 'Enter at least one Google Chat channel email';
 
 // Webhook delivery sends through the Destination's Credential, so it holds nothing here.
 const googleChatWebhookCredentialsSchema = z.object({
@@ -7,10 +10,19 @@ const googleChatWebhookCredentialsSchema = z.object({
 
 const googleChatEmailCredentialsSchema = z.object({
   deliveryMethod: z.literal('email'),
-  to: z.array(z.email()).min(1, 'Enter at least one Google Chat channel email'),
+  to: z
+    .array(z.string(), {
+      error: () => EMPTY_CHANNEL_LIST,
+    })
+    .superRefine((emails, ctx) => {
+      const message = emailListIssue(emails, EMPTY_CHANNEL_LIST);
+      if (message) {
+        ctx.addIssue({ code: 'custom', message });
+      }
+    }),
 });
 
-export const googleChatCredentialsSchema = z.union([
+export const googleChatCredentialsSchema = z.discriminatedUnion('deliveryMethod', [
   googleChatWebhookCredentialsSchema,
   googleChatEmailCredentialsSchema,
 ]);

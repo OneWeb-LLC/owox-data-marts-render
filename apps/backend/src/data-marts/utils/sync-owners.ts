@@ -19,7 +19,9 @@ export async function syncOwners<T extends ObjectLiteral>(
     const invalidIds = uniqueOwnerIds.filter(id => !memberIds.has(id));
     if (invalidIds.length > 0) {
       throw new BadRequestException(
-        `The following user IDs are not members of this project: ${invalidIds.join(', ')}`
+        invalidIds.length === 1
+          ? 'The selected owner is not a member of this project. Choose a current member, or clear Ownership.'
+          : 'Some selected owners are not members of this project. Choose current members, or clear Ownership.'
       );
     }
   }

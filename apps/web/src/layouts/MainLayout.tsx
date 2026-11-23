@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { Outlet } from 'react-router';
+import { useEffect, useState } from 'react';
+import { Outlet, useLocation } from 'react-router';
+import { documentTitleForPath } from './document-title';
 import {
   SidebarInset,
   SidebarProvider,
@@ -99,6 +100,11 @@ function RestrictedProjectSidebar() {
 }
 
 function MainLayoutContent({ accountOnly }: { accountOnly: boolean }) {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    document.title = documentTitleForPath(pathname);
+  }, [pathname]);
+
   const { state, isMobile } = useSidebar();
   const user = useUser();
   const isCollapsed = state === 'collapsed';

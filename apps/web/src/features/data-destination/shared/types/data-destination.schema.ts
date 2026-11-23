@@ -94,6 +94,18 @@ export const dataDestinationSchema = z
         message: SELECT_CREDENTIAL,
       });
     }
+    // An email-family destination with no credentials object never reaches the list schema.
+    const needsEmailList =
+      data.type === DataDestinationType.EMAIL ||
+      data.type === DataDestinationType.SLACK ||
+      data.type === DataDestinationType.MS_TEAMS;
+    if (needsEmailList && !data.credentials) {
+      context.addIssue({
+        code: 'custom',
+        path: ['credentials', 'to'],
+        message: 'Add at least one email address',
+      });
+    }
   });
 
 // Type for the form data
