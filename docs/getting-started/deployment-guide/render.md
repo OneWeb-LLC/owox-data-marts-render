@@ -60,6 +60,10 @@ Go **Environment** section in menu and set:
 
 ## Troubleshooting
 
+- **Docker build fails with `docker-packages/image-package.json: not found`**
+  - Prefer **Existing image** as the source (`ghcr.io/owox/owox-data-marts:latest` or `:next`) instead of building this repository’s Dockerfile on Render. That is the supported path.
+  - If you must deploy from a Git branch, use the current `Dockerfile`: it packs the workspaces inside the image when `docker-packages/` is absent from the checkout. Ensure the service uses **Docker** runtime (not a native Node build) and the repository root as the build context.
+
 - **504 Gateway Timeout**
   - Ensure the app listens on the `PORT` provided by Render
   - Increase Health Check timeout to 10–15s
