@@ -1,0 +1,54 @@
+# Render Blueprint — Oweb OWOX satellite (reference)
+#
+# MySQL is NOT provisioned by Render. Create external MySQL 8 and set DB_* secrets
+# in the dashboard (or via sync: false placeholders below).
+# OWOX app DB types: sqlite | mysql — not Render Managed Postgres.
+#
+# Docs: docs/getting-started/deployment-guide/render-oweb-satellite.md
+#
+# Apply: connect this repo in Render Dashboard → Blueprints, or merge and use
+# "New Blueprint Instance". Adjust region/plan to your account.
+
+services:
+  - type: web
+    name: owox-oweb-satellite
+    runtime: image
+    image:
+      url: ghcr.io/owox/owox-data-marts:next
+    plan: standard
+    numInstances: 1
+    region: oregon
+    healthCheckPath: /
+    disk:
+      name: owox-data
+      mountPath: /root/.local/share/owox/
+      sizeGB: 5
+    envVars:
+      - key: LOG_FORMAT
+        value: json
+      - key: DB_TYPE
+        value: mysql
+      - key: IDP_PROVIDER
+        value: better-auth
+      - key: IDP_BETTER_AUTH_DATABASE_TYPE
+        value: mysql
+      - key: SCHEDULER_EXECUTION_ENABLED
+        value: "true"
+      - key: PUBLIC_ORIGIN
+        sync: false
+      - key: IDP_BETTER_AUTH_SECRET
+        sync: false
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_DATABASE
+        sync: false
+      - key: DB_MYSQL_SSL
+        value: "true"
+      - key: LICENSE_KEY
+        sync: false

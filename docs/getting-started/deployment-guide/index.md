@@ -11,6 +11,7 @@ If you prefer not to host anything, use [OWOX Cloud Editions](../../editions/owo
 | Try it on your own computer in minutes | [Local Deployment](./local-deployment.md) |
 | Run it on Google Cloud with Cloud Run and Cloud SQL | [Google Cloud Platform](./google-cloud-platform.md) |
 | Deploy from a container image without managing servers | [Render](./render.md) |
+| Oweb satellite on Render + external MySQL + warehouse | [Render Oweb satellite](./render-oweb-satellite.md) |
 | Use DigitalOcean App Platform and Managed MySQL | [DigitalOcean](./digitalocean.md) |
 
 ## Configure your deployment
