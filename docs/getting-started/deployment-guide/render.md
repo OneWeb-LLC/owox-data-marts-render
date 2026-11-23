@@ -34,6 +34,11 @@ In the Advanced → **Disks** section, add:
 1. Click **Deploy Web Service**
 2. Wait until the service builds and starts
 
+For production **Oweb** deployments with external MySQL, a single instance, and
+BigQuery as the marketing warehouse, use the dedicated guide
+[Render Oweb satellite](./render-oweb-satellite.md) and
+[architecture overview](../../architecture/oweb-satellite-one-os.md).
+
 ## Configure Authorization Better-Auth (recommended)
 
 <https://github.com/user-attachments/assets/e7adacff-cdb5-40d8-bb07-e6d2f0be445b>
@@ -68,9 +73,10 @@ Go **Environment** section in menu and set:
   - Ensure the app listens on the `PORT` provided by Render
   - Increase Health Check timeout to 10–15s
 
-- **Database not persisted**  
-  - Check `DATABASE_URL` points to `/root/.local/share/owox/`
+- **Database not persisted (SQLite)**  
+  - Set `DB_TYPE=sqlite` and `SQLITE_DB_PATH` under the disk (e.g. under `/root/.local/share/owox/`)
   - Ensure the persistent disk is attached
+  - With `DB_TYPE=mysql`, persistence is on your external MySQL host, not the Render disk
 
 - **App runs but blank page**  
   - Verify `PUBLIC_ORIGIN` is set correctly
