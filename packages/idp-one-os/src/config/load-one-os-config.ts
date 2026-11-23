@@ -24,6 +24,10 @@ export interface OneOsIdpConfig {
   roleClaimPath: string;
   accessTokenTtlSeconds: number;
   sessionCookieMaxAgeMs: number;
+  /** Bearer token for One OS backend activation calls (min 32 chars when set). */
+  activationSecret?: string;
+  /** JSON file path for workspace ↔ project bindings (Phase C). */
+  bindingsFilePath: string;
 }
 
 function parseRole(value: string | undefined, fallback: Role): Role {
@@ -91,5 +95,10 @@ export function loadOneOsIdpConfigFromEnv(env: NodeJS.ProcessEnv = process.env):
     roleClaimPath: env.IDP_ONE_OS_ROLE_CLAIM_PATH ?? 'app_metadata.owox_role',
     accessTokenTtlSeconds: Number.parseInt(env.IDP_ONE_OS_ACCESS_TOKEN_TTL ?? '900', 10),
     sessionCookieMaxAgeMs: Number.parseInt(env.IDP_ONE_OS_SESSION_MAX_AGE_MS ?? '2592000000', 10),
+    activationSecret:
+      (env.IDP_ONE_OS_ACTIVATION_SECRET ?? '').trim().length >= 32
+        ? (env.IDP_ONE_OS_ACTIVATION_SECRET ?? '').trim()
+        : undefined,
+    bindingsFilePath: (env.IDP_ONE_OS_BINDINGS_FILE ?? '').trim(),
   };
 }

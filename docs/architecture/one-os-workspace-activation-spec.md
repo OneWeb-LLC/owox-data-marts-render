@@ -1,6 +1,6 @@
 # One OS workspace activation (specification draft)
 
-**Status:** Design — not implemented in OWOX core.  
+**Status:** Implemented on the satellite (preview) via `@owox/idp-one-os` activation API.  
 **Parent:** [Oweb satellite architecture](./oweb-satellite-one-os.md)
 
 This specifies the smallest product behavior to **activate OWOX for a One OS
@@ -47,9 +47,11 @@ bootstrap admin), then inserts the binding row.
 
 | Endpoint | Caller | Action |
 | -------- | ------ | ------ |
-| `POST /internal/owox/activate` | One OS backend | Given `workspace_id`, create OWOX project on satellite, return `project_id` |
-| `GET /internal/owox/bindings/:workspace_id` | One OS | Resolve `satellite_url` + `project_id` for deep links |
-| `DELETE /internal/owox/activate/:workspace_id` | One OS admin | Suspend binding; optionally archive OWOX project |
+| `POST /internal/one-os/workspaces/activate` | One OS backend | Body `workspaceId`, optional `projectId` / `projectTitle`; persists binding |
+| `GET /internal/one-os/workspaces/:workspaceId/binding` | One OS | Resolve `satelliteUrl` + `projectId` for deep links |
+| `DELETE /internal/one-os/workspaces/:workspaceId` | One OS admin | Suspend binding |
+
+Bearer auth: `IDP_ONE_OS_ACTIVATION_SECRET`. Bindings file on satellite disk (`IDP_ONE_OS_BINDINGS_FILE`).
 
 All endpoints require mTLS or signed service tokens between One OS and the
 satellite. Do not expose without authentication.
@@ -85,7 +87,7 @@ One OS UI → "Open OWOX"
 
 ## Acceptance criteria (v1)
 
-- [ ] Documented binding table and provision API
-- [ ] One test workspace can be activated manually (scripted)
+- [x] Documented binding store and activation API (`packages/idp-one-os`)
+- [ ] One test workspace activated from One OS backend (manual `curl` or Supabase function)
 - [ ] OWOX project exists and BigQuery storage can be added independently
 - [ ] IdP cutover checklist written before disabling Better Auth

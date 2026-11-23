@@ -31,8 +31,10 @@ For the minimal Render quick start (image + disk + Better Auth only), see
 | DuckDB files (optional) | Render **disk** at `/root/.local/share/owox/` (single instance only) |
 | Marketing data | **BigQuery** (configured in OWOX UI as a storage) |
 
-Do **not** use Render Managed Postgres as the OWOX application database. OWOX
-self-managed installs support `DB_TYPE=sqlite` or `DB_TYPE=mysql` only.
+Render **does** offer managed **PostgreSQL**, but OWOX self-managed installs support only
+`DB_TYPE=sqlite` or `DB_TYPE=mysql` for the **application database** — not Render Postgres.
+Use **external MySQL** (or SQLite on a Render disk). Do not point `DATABASE_URL` from Render
+Postgres at OWOX unless you add a full Postgres app-DB port (not supported today).
 
 ## Step 1 — Create the web service
 

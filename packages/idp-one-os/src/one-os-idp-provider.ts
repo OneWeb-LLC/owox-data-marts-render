@@ -33,18 +33,68 @@ import type { OneOsIdpConfig } from './config/load-one-os-config.js';
 import { OneOsSessionStore } from './session/session-store.js';
 import { readClaimPath, verifySupabaseAccessToken } from './supabase/verify-supabase-jwt.js';
 import { signAccessToken, verifyAccessToken } from './tokens/access-token.js';
+import { WorkspaceBindingStore } from './workspace/workspace-binding-store.js';
+import express from 'express';
 
 const SESSION_COOKIE = 'one-os.session';
 
 export class OneOsIdpProvider implements IdpProvider {
   private readonly sessions = new OneOsSessionStore();
+  private readonly bindings: WorkspaceBindingStore;
 
-  constructor(private readonly config: OneOsIdpConfig) {}
+  constructor(private readonly config: OneOsIdpConfig) {
+    const bindingsPath = WorkspaceBindingStore.resolveDefaultPath(
+      this.config.bindingsFilePath || undefined,
+      this.config.baseUrl
+    );
+    this.bindings = new WorkspaceBindingStore(bindingsPath);
+  }
 
   registerRoutes(app: Express): void {
     app.get('/auth/one-os/callback', (req, res) => {
       void this.handleCallback(req, res);
     });
+
+    const internal = express.Router();
+    internal.use(express.json());
+    internal.post('/workspaces/activate', (req, res) => {
+      if (!this.requireActivationAuth(req, res)) return;
+      const body = req.body as {
+        workspaceId?: string;
+        projectId?: string;
+        projectTitle?: string;
+      };
+      if (!body.workspaceId || typeof body.workspaceId !== 'string') {
+        res.status(400).json({ error: 'workspaceId is required' });
+        return;
+      }
+      const binding = this.bindings.activate({
+        workspaceId: body.workspaceId,
+        projectId: body.projectId,
+        projectTitle: body.projectTitle,
+        satelliteUrl: this.config.baseUrl,
+      });
+      res.status(201).json(binding);
+    });
+    internal.get('/workspaces/:workspaceId/binding', (req, res) => {
+      if (!this.requireActivationAuth(req, res)) return;
+      const binding = this.bindings.get(req.params.workspaceId);
+      if (!binding || binding.status !== 'active') {
+        res.status(404).json({ error: 'No active binding' });
+        return;
+      }
+      res.json(binding);
+    });
+    internal.delete('/workspaces/:workspaceId', (req, res) => {
+      if (!this.requireActivationAuth(req, res)) return;
+      const binding = this.bindings.suspend(req.params.workspaceId);
+      if (!binding) {
+        res.status(404).json({ error: 'Binding not found' });
+        return;
+      }
+      res.json(binding);
+    });
+    app.use('/internal/one-os', internal);
   }
 
   async initialize(): Promise<void> {
@@ -145,20 +195,32 @@ export class OneOsIdpProvider implements IdpProvider {
   }
 
   async getProjects(_accessToken: string): Promise<Projects> {
-    return [
-      {
-        id: this.config.defaultProjectId,
-        title: this.config.projectTitle,
-        status: 'active',
-        roles: ['editor'],
-      },
-    ];
+    const active = this.bindings.listActive();
+    if (active.length === 0) {
+      return [
+        {
+          id: this.config.defaultProjectId,
+          title: this.config.projectTitle,
+          status: 'active',
+          roles: [this.config.defaultRole],
+        },
+      ];
+    }
+    return active.map(b => ({
+      id: b.projectId,
+      title: b.projectTitle,
+      status: 'active' as const,
+      roles: [this.config.defaultRole],
+    }));
   }
 
   async getProjectForUser(_userId: string, projectId: string): Promise<Project> {
+    const fromBinding = this.bindings.listActive().find(b => b.projectId === projectId);
     return {
       id: projectId,
-      title: projectId === this.config.defaultProjectId ? this.config.projectTitle : projectId,
+      title:
+        fromBinding?.projectTitle ??
+        (projectId === this.config.defaultProjectId ? this.config.projectTitle : projectId),
       status: 'active',
     };
   }
@@ -399,9 +461,14 @@ export class OneOsIdpProvider implements IdpProvider {
   ): Payload {
     const workspaceRaw = readClaimPath(claims, this.config.workspaceClaimPath);
     const workspaceId = typeof workspaceRaw === 'string' ? workspaceRaw : undefined;
-    const projectId =
-      (workspaceId && this.config.workspaceProjectMap[workspaceId]) ??
-      this.config.defaultProjectId;
+    const projectId = this.resolveProjectId(workspaceId);
+    const binding = workspaceId ? this.bindings.get(workspaceId) : null;
+    const projectTitle =
+      binding?.status === 'active'
+        ? binding.projectTitle
+        : workspaceId && this.config.workspaceProjectMap[workspaceId]
+          ? this.config.projectTitle
+          : this.config.projectTitle;
 
     const roleRaw = readClaimPath(claims, this.config.roleClaimPath);
     let role = this.config.defaultRole;
@@ -426,9 +493,37 @@ export class OneOsIdpProvider implements IdpProvider {
       email,
       fullName,
       roles: [role],
-      projectTitle: this.config.projectTitle,
+      projectTitle,
       signinProvider: 'one-os',
     };
+  }
+
+  private resolveProjectId(workspaceId: string | undefined): string {
+    if (workspaceId) {
+      const fromStore = this.bindings.resolveProjectId(workspaceId, '');
+      if (fromStore) return fromStore;
+      const fromEnv = this.config.workspaceProjectMap[workspaceId];
+      if (fromEnv) return fromEnv;
+    }
+    return this.config.defaultProjectId;
+  }
+
+  private requireActivationAuth(req: Request, res: Response): boolean {
+    if (!this.config.activationSecret) {
+      res.status(503).json({ error: 'Workspace activation is not configured' });
+      return false;
+    }
+    const header = req.headers.authorization;
+    if (!header?.startsWith('Bearer ')) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return false;
+    }
+    const token = header.slice('Bearer '.length).trim();
+    if (token !== this.config.activationSecret) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return false;
+    }
+    return true;
   }
 
   private readSession(req: Request): StoredSessionView | null {
