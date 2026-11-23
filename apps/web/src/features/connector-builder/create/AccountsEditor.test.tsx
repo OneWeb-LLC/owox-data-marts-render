@@ -18,7 +18,7 @@ vi.mock('react-hot-toast', () => ({ toast: { success: vi.fn(), error: vi.fn() } 
 
 function renderPage() {
   render(<ConnectorBuilderPage />);
-  fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+  fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
   // Accounts now lives on the Parameters tab (no longer under General).
   fireEvent.click(screen.getByText('Parameters'));
 }

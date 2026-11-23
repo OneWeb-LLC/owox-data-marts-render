@@ -43,7 +43,7 @@ describe('Builder Nodes flow', () => {
   it('adds a node with a GET request and a field, and the saved manifest reflects it', async () => {
     render(<ConnectorBuilderPage />);
 
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
 
     fireEvent.change(screen.getByPlaceholderText('Node name'), { target: { value: 'items' } });
     fireEvent.click(screen.getByRole('button', { name: /add node/i }));
@@ -69,7 +69,7 @@ describe('Builder Nodes flow', () => {
   it('adds an "add" transformation to a node and the saved manifest reflects it', async () => {
     render(<ConnectorBuilderPage />);
 
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
     fireEvent.change(screen.getByPlaceholderText('Node name'), { target: { value: 'items' } });
     fireEvent.click(screen.getByRole('button', { name: /add node/i }));
 
@@ -94,7 +94,7 @@ describe('Builder Nodes flow', () => {
   it('renames a node by editing its title and rekeys the manifest', async () => {
     render(<ConnectorBuilderPage />);
 
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
     fireEvent.change(screen.getByPlaceholderText('Node name'), { target: { value: 'items' } });
     fireEvent.click(screen.getByRole('button', { name: /add node/i }));
 
@@ -134,7 +134,7 @@ describe('Builder Nodes flow', () => {
   it('adds an error-handler filter to a node and the saved manifest reflects it', async () => {
     render(<ConnectorBuilderPage />);
 
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
     fireEvent.change(screen.getByPlaceholderText('Node name'), { target: { value: 'items' } });
     fireEvent.click(screen.getByRole('button', { name: /add node/i }));
 
@@ -154,7 +154,7 @@ describe('Builder Nodes flow', () => {
 
   it('authors message/body match and an exponential default backoff', async () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
     fireEvent.change(screen.getByPlaceholderText('Node name'), { target: { value: 'items' } });
     fireEvent.click(screen.getByRole('button', { name: /add node/i }));
 
@@ -196,7 +196,7 @@ describe('Builder Nodes flow', () => {
 
   it('keeps each error-filter row showing its own codes after a middle filter is deleted', async () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
     fireEvent.change(screen.getByPlaceholderText('Node name'), { target: { value: 'items' } });
     fireEvent.click(screen.getByRole('button', { name: /add node/i }));
 
@@ -217,7 +217,7 @@ describe('Builder Nodes flow', () => {
   it('sets a CSV response format on a node and the saved manifest reflects it', async () => {
     render(<ConnectorBuilderPage />);
 
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
     fireEvent.change(screen.getByPlaceholderText('Node name'), { target: { value: 'items' } });
     fireEvent.click(screen.getByRole('button', { name: /add node/i }));
 
@@ -235,7 +235,7 @@ describe('Builder Nodes flow', () => {
   it('configures a substream partitionRouter on a node, saved in the manifest', async () => {
     render(<ConnectorBuilderPage />);
 
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
     fireEvent.change(screen.getByPlaceholderText('Node name'), { target: { value: 'items' } });
     fireEvent.click(screen.getByRole('button', { name: /add node/i }));
 
@@ -263,7 +263,7 @@ describe('Builder Nodes flow', () => {
 
   it('authors a list partition router', async () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
     fireEvent.change(screen.getByPlaceholderText('Node name'), { target: { value: 'items' } });
     fireEvent.click(screen.getByRole('button', { name: /add node/i }));
     fireEvent.click(screen.getByRole('checkbox', { name: /enable partitioning/i }));
@@ -284,7 +284,7 @@ describe('Builder Nodes flow', () => {
 
   it('authors a record filter', async () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
     fireEvent.change(screen.getByPlaceholderText('Node name'), { target: { value: 'items' } });
     fireEvent.click(screen.getByRole('button', { name: /add node/i }));
     fireEvent.click(screen.getByRole('checkbox', { name: /enable record filter/i }));

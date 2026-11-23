@@ -18,7 +18,7 @@ vi.mock('react-hot-toast', () => ({ toast: { success: vi.fn(), error: vi.fn() } 
 
 function addNode() {
   render(<ConnectorBuilderPage />);
-  fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+  fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
   fireEvent.change(screen.getByPlaceholderText('Node name'), { target: { value: 'items' } });
   fireEvent.click(screen.getByRole('button', { name: /add node/i }));
 }

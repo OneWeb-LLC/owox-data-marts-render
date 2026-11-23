@@ -60,7 +60,7 @@ async function openVersionAndEdit(version: number) {
     expect(getVersion).toHaveBeenCalledWith('def-1', version);
   });
 
-  fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'Edited' } });
+  fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'Edited' } });
 }
 
 describe('saving from an older version', () => {
@@ -124,7 +124,7 @@ describe('saving from an older version', () => {
     await waitFor(() => {
       expect(getById).toHaveBeenCalled();
     });
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'Edited' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'Edited' } });
 
     fireEvent.click(screen.getByRole('button', { name: /save draft/i }));
     await waitFor(() => {

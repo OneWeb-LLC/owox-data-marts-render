@@ -260,3 +260,55 @@ describe('useBuilder publish report', () => {
     );
   });
 });
+
+describe('useBuilder create identity', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.mocked(toast.error).mockClear();
+  });
+
+  it('explains a missing name instead of sending the create request', async () => {
+    const create = vi.spyOn(ConnectorBuilderApiService.prototype, 'create');
+    const { result } = renderHook(() => useBuilder(), { wrapper: BuilderProvider });
+    await act(async () => {
+      await result.current.saveDraft();
+    });
+    expect(create).not.toHaveBeenCalled();
+    expect(toast.error).toHaveBeenCalledWith(
+      'Enter a name. Use letters, digits and underscores, and start with a letter.'
+    );
+  });
+
+  it('stores a blank title as the name so the field shows what was saved', async () => {
+    vi.spyOn(ConnectorBuilderApiService.prototype, 'create').mockResolvedValue({
+      id: 'def-1',
+      name: 'MyApi',
+      title: 'MyApi',
+    });
+    vi.spyOn(ConnectorBuilderApiService.prototype, 'getById').mockResolvedValue({
+      id: 'def-1',
+      name: 'MyApi',
+      title: 'MyApi',
+      description: null,
+      logo: null,
+      docUrl: null,
+      activeVersionId: null,
+      versions: [{ version: 1, status: 'draft', publishedAt: null }],
+    });
+    const { result } = renderHook(() => useBuilder(), { wrapper: BuilderProvider });
+    act(() => {
+      result.current.setPath(['name'], 'MyApi');
+    });
+    await act(async () => {
+      await result.current.saveDraft();
+    });
+    expect(ConnectorBuilderApiService.prototype.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'MyApi',
+        manifest: expect.objectContaining({ title: 'MyApi' }),
+      })
+    );
+    expect(result.current.manifest.title).toBe('MyApi');
+    expect(result.current.state.dirty).toBe(false);
+  });
+});

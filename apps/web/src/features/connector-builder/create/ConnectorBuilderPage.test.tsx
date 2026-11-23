@@ -79,8 +79,8 @@ describe('ConnectorBuilderPage (new)', () => {
   it('fills General, adds a parameter, saves (creates) then publishes', async () => {
     render(<ConnectorBuilderPage />);
 
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
-    fireEvent.change(screen.getByPlaceholderText('https://api.example.com'), {
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. https://api.example.com'), {
       target: { value: 'https://api.example.com' },
     });
 
@@ -124,7 +124,7 @@ describe('ConnectorBuilderPage (new)', () => {
       hiddenStoppingCount: 0,
     });
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
 
     fireEvent.click(screen.getByRole('button', { name: /publish/i }));
 
@@ -153,7 +153,7 @@ describe('ConnectorBuilderPage (new)', () => {
   it('reports the new connector id after the first Save draft (for the URL swap)', async () => {
     const onCreated = vi.fn();
     render(<ConnectorBuilderPage onCreated={onCreated} />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
     fireEvent.click(screen.getByRole('button', { name: /save draft/i }));
     await waitFor(() => {
       expect(create).toHaveBeenCalledTimes(1);
@@ -165,8 +165,8 @@ describe('ConnectorBuilderPage (new)', () => {
 
   it('locks the connector name once the connector exists', async () => {
     render(<ConnectorBuilderPage />);
-    expect(screen.getByPlaceholderText('MyCustomApi')).not.toHaveAttribute('readonly');
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    expect(screen.getByPlaceholderText('e.g. MyCustomApi')).not.toHaveAttribute('readonly');
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
 
     fireEvent.click(screen.getByRole('button', { name: /save draft/i }));
     await waitFor(() => {
@@ -176,7 +176,7 @@ describe('ConnectorBuilderPage (new)', () => {
     // Only create() writes the definition row's name, and that name is what data marts
     // resolve a connector by. Editing this afterwards renames the manifest alone: the
     // builder would show the new name and every other surface the old one, forever.
-    expect(screen.getByPlaceholderText('MyCustomApi')).toHaveAttribute('readonly');
+    expect(screen.getByPlaceholderText('e.g. MyCustomApi')).toHaveAttribute('readonly');
   });
 
   /**
@@ -191,7 +191,7 @@ describe('ConnectorBuilderPage (new)', () => {
       expect(getById).toHaveBeenCalledTimes(1);
     });
 
-    fireEvent.change(screen.getByPlaceholderText('My Custom API'), {
+    fireEvent.change(screen.getByPlaceholderText('e.g. My Custom API'), {
       target: { value: 'Renamed API' },
     });
     fireEvent.click(screen.getByRole('button', { name: /save draft/i }));
@@ -213,7 +213,7 @@ describe('ConnectorBuilderPage (new)', () => {
     getById.mockRejectedValueOnce(new Error('Network Error'));
     saveDraft.mockResolvedValue({ version: 1, status: 'draft', publishedAt: null });
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
 
     fireEvent.click(screen.getByRole('button', { name: /save draft/i }));
     await waitFor(() => {
@@ -221,7 +221,7 @@ describe('ConnectorBuilderPage (new)', () => {
     });
 
     // create() stored the manifest, so the next save needs an edit to have something to save.
-    fireEvent.change(screen.getByPlaceholderText('My Custom API'), { target: { value: 'My API' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. My Custom API'), { target: { value: 'My API' } });
     fireEvent.click(screen.getByRole('button', { name: /save draft/i }));
     await waitFor(() => {
       expect(saveDraft).toHaveBeenCalledWith('def-1', expect.anything());
@@ -251,7 +251,7 @@ describe('ConnectorBuilderPage (new)', () => {
     );
     const onCreated = vi.fn();
     render(<ConnectorBuilderPage onCreated={onCreated} />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
 
     fireEvent.click(screen.getByRole('button', { name: /publish/i }));
     await waitFor(() => {
@@ -267,7 +267,7 @@ describe('ConnectorBuilderPage (new)', () => {
 
   it('writes a source-level rateLimit from the General editor', async () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
     fireEvent.change(screen.getByPlaceholderText('100'), { target: { value: '100' } });
     fireEvent.change(screen.getByPlaceholderText('60'), { target: { value: '60' } });
 
@@ -280,7 +280,7 @@ describe('ConnectorBuilderPage (new)', () => {
 
   it('omits rateLimit when both inputs are emptied', async () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
     const requests = screen.getByPlaceholderText('100');
     const perSeconds = screen.getByPlaceholderText('60');
     fireEvent.change(requests, { target: { value: '100' } });
@@ -297,8 +297,8 @@ describe('ConnectorBuilderPage (new)', () => {
 
   it('sends the authored Title instead of the name when one is filled in', async () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
-    fireEvent.change(screen.getByPlaceholderText('My Custom API'), {
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. My Custom API'), {
       target: { value: 'My API' },
     });
 
@@ -311,7 +311,7 @@ describe('ConnectorBuilderPage (new)', () => {
 
   it('authors a parameter label and default', async () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
     fireEvent.click(screen.getByText('Parameters'));
     addParameter('Token');
 
@@ -366,7 +366,7 @@ describe('ConnectorBuilderPage — Code mode text typed right before an action',
   /** A connector saved once, so nothing is left unsaved, open in Code mode. */
   const savedConnectorInCode = async () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
     fireEvent.click(screen.getByRole('button', { name: /save draft/i }));
     await waitFor(() => {
       expect(getById).toHaveBeenCalledWith('def-1');
@@ -376,7 +376,7 @@ describe('ConnectorBuilderPage — Code mode text typed right before an action',
 
   it('Save draft saves it', async () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
     fireEvent.click(screen.getByTestId('mode-code'));
 
     typeInCode(m => {
@@ -482,13 +482,13 @@ describe('ConnectorBuilderPage — Code mode text typed right before an action',
           };
         })
     );
-    fireEvent.change(screen.getByPlaceholderText('My Custom API'), { target: { value: 'First' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. My Custom API'), { target: { value: 'First' } });
     fireEvent.click(screen.getByRole('button', { name: /save draft/i }));
     await waitFor(() => {
       expect(saveDraft).toHaveBeenCalledTimes(1);
     });
 
-    fireEvent.change(screen.getByPlaceholderText('https://api.example.com'), {
+    fireEvent.change(screen.getByPlaceholderText('e.g. https://api.example.com'), {
       target: { value: 'https://api.example.org' },
     });
     releaseSave();
@@ -535,7 +535,7 @@ describe('ConnectorBuilderPage — publishing with an older version open', () =>
   // Discard reloaded the newest version, so the author was moved off the one they had open.
   it('discards back to the open version, not the newest', async () => {
     render(<ConnectorBuilderPage id='def-1' />);
-    const baseUrl = () => screen.getByPlaceholderText('https://api.example.com');
+    const baseUrl = () => screen.getByPlaceholderText('e.g. https://api.example.com');
     await waitFor(() => {
       expect(baseUrl()).toHaveValue('https://v2.example.com');
     });
@@ -560,7 +560,7 @@ describe('ConnectorBuilderPage — publishing with an older version open', () =>
   // over the edits that were still on screen.
   it('says so when the reload behind Discard fails', async () => {
     render(<ConnectorBuilderPage id='def-1' />);
-    const baseUrl = () => screen.getByPlaceholderText('https://api.example.com');
+    const baseUrl = () => screen.getByPlaceholderText('e.g. https://api.example.com');
     await waitFor(() => {
       expect(baseUrl()).toHaveValue('https://v2.example.com');
     });
@@ -579,7 +579,7 @@ describe('ConnectorBuilderPage — publishing with an older version open', () =>
 
   it('says so when a version fails to open', async () => {
     render(<ConnectorBuilderPage id='def-1' />);
-    const baseUrl = () => screen.getByPlaceholderText('https://api.example.com');
+    const baseUrl = () => screen.getByPlaceholderText('e.g. https://api.example.com');
     await waitFor(() => {
       expect(baseUrl()).toHaveValue('https://v2.example.com');
     });
@@ -595,7 +595,7 @@ describe('ConnectorBuilderPage — publishing with an older version open', () =>
 
   it('publishes the open version, as "Replace & publish" says, with nothing edited', async () => {
     render(<ConnectorBuilderPage id='def-1' />);
-    const baseUrl = () => screen.getByPlaceholderText('https://api.example.com');
+    const baseUrl = () => screen.getByPlaceholderText('e.g. https://api.example.com');
     await waitFor(() => {
       expect(baseUrl()).toHaveValue('https://v2.example.com');
     });
@@ -638,7 +638,7 @@ describe('ConnectorBuilderPage — nothing to publish', () => {
 
   it('offers Publish only once something changed since the newest version was published', async () => {
     render(<ConnectorBuilderPage id='def-1' />);
-    const baseUrl = () => screen.getByPlaceholderText('https://api.example.com');
+    const baseUrl = () => screen.getByPlaceholderText('e.g. https://api.example.com');
     await waitFor(() => {
       expect(baseUrl()).toHaveValue('https://api.example.com');
     });
@@ -677,7 +677,7 @@ describe('ConnectorBuilderPage — a connector that could not be opened', () => 
     fireEvent.click(screen.getByRole('button', { name: /try again/i }));
 
     await waitFor(() => {
-      expect(screen.getByPlaceholderText('https://api.example.com')).toHaveValue(
+      expect(screen.getByPlaceholderText('e.g. https://api.example.com')).toHaveValue(
         'https://api.example.com'
       );
     });
@@ -717,7 +717,7 @@ describe('ConnectorBuilderPage — connector icon', () => {
 
   it('creates a new connector with the uploaded icon', async () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
     uploadIcon();
     await waitFor(() => {
       expect(preview()).toHaveAttribute('src', SVG_URI);
@@ -821,7 +821,7 @@ describe('ConnectorBuilderPage — connector icon', () => {
 
     const openVersionOne = async () => {
       render(<ConnectorBuilderPage id='def-1' />);
-      const baseUrl = () => screen.getByPlaceholderText('https://api.example.com');
+      const baseUrl = () => screen.getByPlaceholderText('e.g. https://api.example.com');
       await waitFor(() => {
         expect(baseUrl()).toHaveValue('https://v2.example.com');
       });
@@ -871,7 +871,7 @@ describe('ConnectorBuilderPage — connector icon', () => {
     await waitFor(() => {
       expect(preview()).toHaveAttribute('src', SAVED_URI);
     });
-    fireEvent.change(screen.getByPlaceholderText('My Custom API'), {
+    fireEvent.change(screen.getByPlaceholderText('e.g. My Custom API'), {
       target: { value: 'Renamed API' },
     });
     uploadIcon();

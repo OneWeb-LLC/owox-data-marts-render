@@ -5,6 +5,7 @@ import { BuilderActionType, type BuilderState, type ManifestOrigin } from '../co
 import { ConnectorBuilderApiService } from '../../api/connector-builder-api.service';
 import { createEmptyManifest, createEmptyNode, type BuilderManifest } from '../manifest.types';
 import { firstNonEmpty } from '../asText';
+import { connectorNameProblem, manifestWithDisplayTitle } from '../manifestNames';
 import { apiErrorMessage } from '../../../../../app/api/extract-api-error.util';
 import type { StoppingReport } from '../../api/types';
 import { describeApiFailure, trackCustomConnectorEvent } from '../analytics';
@@ -232,14 +233,21 @@ export function useBuilder() {
       let id = state.id;
       let written = false;
       try {
+        const nameProblem = !state.id ? connectorNameProblem(manifest.name) : null;
+        if (nameProblem) {
+          dispatch({ type: BuilderActionType.SET_ERROR, payload: nameProblem });
+          toast.error(nameProblem);
+          return null;
+        }
+        const draft = manifestWithDisplayTitle(manifest);
         if (!state.id) {
           const created = await api.create({
-            name: manifest.name,
-            title: firstNonEmpty(manifest.title, manifest.name),
-            description: manifest.description,
-            docUrl: manifest.docUrl,
+            name: draft.name,
+            title: firstNonEmpty(draft.title, draft.name),
+            description: draft.description,
+            docUrl: draft.docUrl,
             logo: state.logo ?? undefined,
-            manifest,
+            manifest: draft,
           });
           id = created.id;
           written = true;

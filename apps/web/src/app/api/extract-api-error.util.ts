@@ -25,8 +25,24 @@ export const extractApiError = (error: unknown): ApiError => {
  * `showApiErrorToast` already does for the toasts the interceptor raises; this is the same
  * precedence for the call sites that render the message themselves.
  */
+function validationDetailText(error: unknown): string | null {
+  const errors = extractApiError(error).details?.errors;
+  if (!Array.isArray(errors)) return null;
+  const parts = errors
+    .map(entry => (typeof entry.message === 'string' ? entry.message.trim() : ''))
+    .filter(part => part.length > 0);
+  const unique = [...new Set(parts)];
+  if (unique.length === 0) return null;
+  const shown = unique.slice(0, 3);
+  const hidden = unique.length - shown.length;
+  return hidden > 0 ? `${shown.join(' ')} (+${hidden} more)` : shown.join(' ');
+}
+
 export const apiErrorMessage = (error: unknown, fallback: string): string => {
-  const serverMessage = extractApiError(error).message?.trim();
+  const serverMessage = extractApiError(error).message?.trim() ?? '';
+  const details = validationDetailText(error);
+  if (details && (!serverMessage || serverMessage === 'Request validation failed')) return details;
+  if (details && !serverMessage.includes(details)) return `${serverMessage} ${details}`;
   if (serverMessage) return serverMessage;
   const thrownMessage = error instanceof Error ? error.message.trim() : '';
   return thrownMessage || fallback;

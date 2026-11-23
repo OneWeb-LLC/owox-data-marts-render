@@ -37,6 +37,7 @@ import {
   buildOwebConstellationSignInUrl,
   redeemOwebLaunchToken,
 } from './ecosystem/redeem-launch-token.js';
+import { ProjectMemberRegistry } from './workspace/project-member-registry.js';
 import { WorkspaceBindingStore } from './workspace/workspace-binding-store.js';
 import express from 'express';
 
@@ -45,6 +46,7 @@ const SESSION_COOKIE = 'one-os.session';
 export class OneOsIdpProvider implements IdpProvider {
   private readonly sessions = new OneOsSessionStore();
   private readonly bindings: WorkspaceBindingStore;
+  private readonly members: ProjectMemberRegistry;
 
   constructor(private readonly config: OneOsIdpConfig) {
     const bindingsPath = WorkspaceBindingStore.resolveDefaultPath(
@@ -52,6 +54,9 @@ export class OneOsIdpProvider implements IdpProvider {
       this.config.baseUrl
     );
     this.bindings = new WorkspaceBindingStore(bindingsPath);
+    this.members = new ProjectMemberRegistry(
+      ProjectMemberRegistry.pathBesideBindings(bindingsPath)
+    );
   }
 
   registerRoutes(app: Express): void {
@@ -117,7 +122,11 @@ export class OneOsIdpProvider implements IdpProvider {
     // In-memory sessions only.
   }
 
-  async signInMiddleware(req: Request, res: Response, _next: NextFunction): Promise<void | Response> {
+  async signInMiddleware(
+    req: Request,
+    res: Response,
+    _next: NextFunction
+  ): Promise<void | Response> {
     if (this.config.ecosystemAppId) {
       const target = buildOwebConstellationSignInUrl(
         this.config.signInUrl,
@@ -134,11 +143,19 @@ export class OneOsIdpProvider implements IdpProvider {
     return res.redirect(target.toString());
   }
 
-  async signUpMiddleware(req: Request, res: Response, next: NextFunction): Promise<void | Response> {
+  async signUpMiddleware(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void | Response> {
     return this.signInMiddleware(req, res, next);
   }
 
-  async signOutMiddleware(req: Request, res: Response, _next: NextFunction): Promise<void | Response> {
+  async signOutMiddleware(
+    req: Request,
+    res: Response,
+    _next: NextFunction
+  ): Promise<void | Response> {
     const sessionId = req.cookies?.[SESSION_COOKIE];
     if (typeof sessionId === 'string') {
       this.sessions.delete(sessionId);
@@ -244,7 +261,10 @@ export class OneOsIdpProvider implements IdpProvider {
   async introspectToken(token: string): Promise<Payload | null> {
     const normalized = this.normalizeBearer(token);
     const owoxPayload = await verifyAccessToken(normalized, this.config.sessionSecret);
-    if (owoxPayload) return owoxPayload;
+    if (owoxPayload) {
+      this.members.remember(owoxPayload);
+      return owoxPayload;
+    }
 
     try {
       const verified = await verifySupabaseAccessToken(
@@ -252,7 +272,13 @@ export class OneOsIdpProvider implements IdpProvider {
         this.config.supabaseUrl,
         this.config.supabaseJwtSecret
       );
-      return this.payloadFromSupabaseClaims(verified.userId, verified.email, verified.claims);
+      const payload = this.payloadFromSupabaseClaims(
+        verified.userId,
+        verified.email,
+        verified.claims
+      );
+      this.members.remember(payload);
+      return payload;
     } catch {
       return null;
     }
@@ -341,10 +367,10 @@ export class OneOsIdpProvider implements IdpProvider {
   }
 
   async getProjectMembers(
-    _projectId: string,
+    projectId: string,
     _options?: GetProjectMembersOptions
   ): Promise<ProjectMember[]> {
-    return [];
+    return this.members.list(projectId);
   }
 
   async inviteMember(
@@ -491,6 +517,7 @@ export class OneOsIdpProvider implements IdpProvider {
       verified.email,
       verified.claims
     );
+    this.members.remember(payload);
     const sessionId = this.sessions.create(payload);
     const isSecure = this.isSecureRequest(req);
     res.cookie(SESSION_COOKIE, sessionId, {

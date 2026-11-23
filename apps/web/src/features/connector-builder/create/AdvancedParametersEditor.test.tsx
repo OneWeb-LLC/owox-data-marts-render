@@ -18,7 +18,7 @@ vi.mock('react-hot-toast', () => ({ toast: { success: vi.fn(), error: vi.fn() } 
 
 function renderPage() {
   render(<ConnectorBuilderPage />);
-  fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+  fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
   // Advanced Parameters lives on the Parameters tab, directly before Accounts.
   fireEvent.click(screen.getByText('Parameters'));
 }

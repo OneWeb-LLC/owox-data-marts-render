@@ -35,7 +35,7 @@ describe('Builder ↔ Code toggle', () => {
 
   it('round-trips a node added via the JSON editor into the builder', () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
 
     fireEvent.click(screen.getByTestId('mode-code'));
     const ta = screen.getByTestId<HTMLTextAreaElement>('monaco');
@@ -70,12 +70,12 @@ describe('Builder ↔ Code toggle', () => {
 
     fireEvent.click(screen.getByTestId('mode-builder'));
     fireEvent.click(await screen.findByRole('button', { name: /discard & switch/i }));
-    expect(screen.getByPlaceholderText('MyCustomApi')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('e.g. MyCustomApi')).toBeInTheDocument();
   });
 
   it('will not save or publish a buffer that does not parse', () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
     fireEvent.click(screen.getByTestId('mode-code'));
     fireEvent.change(screen.getByTestId('monaco'), { target: { value: '{ not valid' } });
 
@@ -96,12 +96,12 @@ describe('Builder ↔ Code toggle', () => {
     await waitFor(() => {
       expect(screen.getByTestId<HTMLTextAreaElement>('monaco').value).toBe('{ half typed');
     });
-    expect(screen.queryByPlaceholderText('MyCustomApi')).toBeNull();
+    expect(screen.queryByPlaceholderText('e.g. MyCustomApi')).toBeNull();
 
     // Confirming drops it, and the builder is savable again.
     fireEvent.click(screen.getByTestId('mode-builder'));
     fireEvent.click(await screen.findByRole('button', { name: /discard & switch/i }));
-    expect(screen.getByPlaceholderText('MyCustomApi')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('e.g. MyCustomApi')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^publish$/i })).toBeEnabled();
   });
 });

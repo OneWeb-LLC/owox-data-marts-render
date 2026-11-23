@@ -55,7 +55,7 @@ describe('Field data path', () => {
 
   function addNodeWithField() {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
     fireEvent.change(screen.getByPlaceholderText('Node name'), { target: { value: 'games' } });
     fireEvent.click(screen.getByRole('button', { name: /add node/i }));
     addField('Japan');
@@ -93,7 +93,7 @@ describe('Field data path', () => {
 
   it('discovers fields from the test sample and preserves existing fields', async () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
     fireEvent.change(screen.getByPlaceholderText('Node name'), { target: { value: 'games' } });
     fireEvent.click(screen.getByRole('button', { name: /add node/i }));
 
@@ -126,7 +126,7 @@ describe('Field data path', () => {
 
   it('disables Discover fields when there is no sample', () => {
     render(<ConnectorBuilderPage />);
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
     fireEvent.change(screen.getByPlaceholderText('Node name'), { target: { value: 'games' } });
     fireEvent.click(screen.getByRole('button', { name: /add node/i }));
     expect(screen.getByRole('button', { name: /discover fields from sample/i })).toBeDisabled();

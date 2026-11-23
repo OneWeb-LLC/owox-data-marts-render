@@ -105,8 +105,8 @@ async function renderExisting() {
 
 function startNewConnector() {
   render(<ConnectorBuilderPage entryPoint='data_mart_wizard' />);
-  fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
-  fireEvent.change(screen.getByPlaceholderText('https://api.example.com'), {
+  fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
+  fireEvent.change(screen.getByPlaceholderText('e.g. https://api.example.com'), {
     target: { value: 'https://api.example.com/v2' },
   });
   fireEvent.change(screen.getByPlaceholderText('Node name'), { target: { value: 'items' } });
@@ -199,7 +199,7 @@ describe('Connector builder analytics', () => {
 
   it('reports a publish with its version and warnings', async () => {
     await renderExisting();
-    fireEvent.change(screen.getByPlaceholderText('My Custom API'), { target: { value: 'Mine' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. My Custom API'), { target: { value: 'Mine' } });
     getById.mockResolvedValue(
       detail(
         [
@@ -228,7 +228,7 @@ describe('Connector builder analytics', () => {
 
   it('reports a failed publish by its kind, not its text', async () => {
     await renderExisting();
-    fireEvent.change(screen.getByPlaceholderText('My Custom API'), { target: { value: 'Mine' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. My Custom API'), { target: { value: 'Mine' } });
     publish.mockRejectedValue(
       apiRefusal(400, {
         message: 'Invalid manifest: nodes.items.request.path is required',
@@ -268,7 +268,7 @@ describe('Connector builder analytics', () => {
 
   it('does not report a publish that landed as failed when the refresh after it fails', async () => {
     await renderExisting();
-    fireEvent.change(screen.getByPlaceholderText('My Custom API'), { target: { value: 'Mine' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. My Custom API'), { target: { value: 'Mine' } });
     publish.mockResolvedValue({
       version: 2,
       status: 'published',

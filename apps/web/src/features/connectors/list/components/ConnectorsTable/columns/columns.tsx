@@ -1,6 +1,7 @@
 import { type ColumnDef } from '@tanstack/react-table';
 import { SortableHeader } from '../../../../../../shared/components/Table';
 import { RawBase64Icon } from '../../../../../../shared/icons';
+import { CustomConnectorIcon } from '../../../../shared/components/CustomConnectorIcon';
 import type { CustomConnectorListItemDto } from '../../../../../connector-builder/shared/api/types';
 import { ConnectorActionsCell } from '../ConnectorActionsCell';
 
@@ -31,7 +32,12 @@ export function getConnectorColumns({
       enableSorting: false,
       meta: { title: 'Logo', showHeaderTitle: false },
       header: () => null,
-      cell: ({ row }) => <RawBase64Icon base64={row.original.logo} size={24} />,
+      cell: ({ row }) =>
+        row.original.logo ? (
+          <RawBase64Icon base64={row.original.logo} size={24} />
+        ) : (
+          <CustomConnectorIcon size={24} />
+        ),
     },
     {
       accessorKey: ConnectorColumnKey.TITLE,

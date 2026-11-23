@@ -111,7 +111,7 @@ describe('ConnectorBuilderRoutePage — a new connector', () => {
 
   it('swaps /new for /:id after the first save without asking about unsaved changes', async () => {
     const router = renderRoute();
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
 
     fireEvent.click(screen.getByRole('button', { name: /save draft/i }));
 
@@ -133,7 +133,7 @@ describe('ConnectorBuilderRoutePage — a new connector', () => {
       })
     );
     const router = renderRoute();
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
 
     fireEvent.click(screen.getByRole('button', { name: /save draft/i }));
 
@@ -162,7 +162,7 @@ describe('ConnectorBuilderRoutePage — a new connector', () => {
     const router = renderRoute();
     fireEvent.click(screen.getByTestId('open-dock'));
     expect(screen.getByTestId('test-panel')).toBeInTheDocument();
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
 
     fireEvent.click(screen.getByRole('button', { name: /save draft/i }));
 
@@ -231,7 +231,7 @@ describe('ConnectorBuilderRoutePage — AI assistant promo', () => {
 
     const pane = screen.getByTestId('builder-scroll-pane');
     const firstChild = pane.firstElementChild;
-    expect(firstChild).toContainElement(screen.getByPlaceholderText('MyCustomApi'));
+    expect(firstChild).toContainElement(screen.getByPlaceholderText('e.g. MyCustomApi'));
   });
 
   it('sends one shown event for the connector builder placement', () => {
@@ -275,7 +275,7 @@ describe('ConnectorBuilderRoutePage — AI assistant promo', () => {
 
   it('keeps the card, now naming the connector, once the first save gives it an id', async () => {
     const router = renderRoute();
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'MyApi' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'MyApi' } });
     fireEvent.click(screen.getByRole('button', { name: /save draft/i }));
 
     await waitFor(() => {

@@ -142,7 +142,7 @@ describe('Version history', () => {
     });
 
     // dirty the editor (type into the connector name on the General editor)
-    fireEvent.change(screen.getByPlaceholderText('MyCustomApi'), { target: { value: 'Edited' } });
+    fireEvent.change(screen.getByPlaceholderText('e.g. MyCustomApi'), { target: { value: 'Edited' } });
 
     fireEvent.click(screen.getByTestId('version-badge'));
     const panel = await screen.findByTestId('version-history');
