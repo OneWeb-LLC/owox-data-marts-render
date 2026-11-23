@@ -26,11 +26,24 @@ const esmImport = new Function('specifier', 'return import(specifier)') as Trans
 export const TRANSFORMERS_IMPORTER = Symbol('TRANSFORMERS_IMPORTER');
 const LOCAL_PIPELINE_INIT_WARN_AFTER_MS = 10_000;
 
+// The MiniLM tokenizer is a wide JSON object. Parsing it on a 512MB cgroup
+// exhausts the V8 heap during startup reindex and the process stops serving HTTP.
+export const LOCAL_EMBEDDING_MIN_CONSTRAINED_BYTES = 768 * 1024 * 1024;
+
+export function localEmbeddingsFit(constrainedBytes: number | undefined): boolean {
+  if (constrainedBytes === undefined || constrainedBytes <= 0) {
+    return true;
+  }
+  return constrainedBytes >= LOCAL_EMBEDDING_MIN_CONSTRAINED_BYTES;
+}
+
 @Injectable()
 export class LocalTransformersEmbeddingProvider implements EmbeddingProvider {
   private readonly logger = new Logger(LocalTransformersEmbeddingProvider.name);
 
   private pipelinePromise: Promise<Pipe | null> | null = null;
+
+  private memorySkipped = false;
 
   constructor(
     @Inject(ADVANCED_SEARCH_CONFIG)
@@ -92,7 +105,7 @@ export class LocalTransformersEmbeddingProvider implements EmbeddingProvider {
   private resolvePipeline(): Promise<Pipe | null> {
     if (this.pipelinePromise === null) {
       this.pipelinePromise = this.initPipeline().then(pipe => {
-        if (pipe === null) {
+        if (pipe === null && !this.memorySkipped) {
           this.pipelinePromise = null;
         }
         return pipe;
@@ -102,6 +115,20 @@ export class LocalTransformersEmbeddingProvider implements EmbeddingProvider {
   }
 
   private async initPipeline(): Promise<Pipe | null> {
+    const constrainedBytes = process.constrainedMemory();
+    if (
+      constrainedBytes !== undefined &&
+      constrainedBytes > 0 &&
+      !localEmbeddingsFit(constrainedBytes)
+    ) {
+      this.memorySkipped = true;
+      const limitMb = Math.round(constrainedBytes / (1024 * 1024));
+      this.logger.warn(
+        `Skipping the local embedding model because this process is limited to ${limitMb}MB. Search uses keyword matching. Semantic search needs a larger instance or ADVANCED_SEARCH_EMBEDDING_PROVIDER=openrouter.`
+      );
+      return null;
+    }
+
     const warnTimer = setTimeout(() => {
       this.logger.warn(
         `local embedding pipeline initialization is still running after ${LOCAL_PIPELINE_INIT_WARN_AFTER_MS}ms; model download or ONNX startup may be slow`
