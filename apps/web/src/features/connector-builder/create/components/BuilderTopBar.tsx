@@ -88,7 +88,7 @@ export function BuilderTopBar({
 
   return (
     <div
-      className='bg-card relative flex h-[52px] min-w-0 flex-none items-center gap-1.5 overflow-x-auto border-b pr-3 pl-2'
+      className='bg-card relative flex min-h-[52px] min-w-0 flex-none flex-wrap items-center gap-x-1.5 gap-y-1 border-b py-1.5 pr-3 pl-11 md:pl-2 lg:h-[52px] lg:flex-nowrap lg:py-0'
       data-testid='builder-topbar'
     >
       {onBack && (
@@ -124,7 +124,7 @@ export function BuilderTopBar({
       )}
 
       {/* Right group */}
-      <div className='ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2.5'>
+      <div className='ml-auto flex w-full shrink-0 flex-wrap items-center justify-end gap-1.5 lg:w-auto lg:flex-nowrap lg:gap-2.5'>
         <Button
           variant='ghost'
           onClick={onToggleTest}
