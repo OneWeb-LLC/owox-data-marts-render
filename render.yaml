@@ -29,9 +29,19 @@ services:
       - key: DB_TYPE
         value: mysql
       - key: IDP_PROVIDER
-        value: better-auth
-      - key: IDP_BETTER_AUTH_DATABASE_TYPE
-        value: mysql
+        value: one-os
+      - key: IDP_ONE_OS_SUPABASE_URL
+        value: https://auth.oweb.one
+      - key: IDP_ONE_OS_SIGN_IN_URL
+        value: https://artemiis.one/login
+      - key: IDP_ONE_OS_SESSION_SECRET
+        sync: false
+      - key: IDP_ONE_OS_ACTIVATION_SECRET
+        sync: false
+      - key: IDP_ONE_OS_BINDINGS_FILE
+        value: /root/.local/share/owox/one-os-workspace-bindings.json
+      - key: SQLITE_DB_PATH
+        value: /root/.local/share/owox/sqlite/backend.db
       - key: SCHEDULER_EXECUTION_ENABLED
         value: "true"
       - key: PUBLIC_ORIGIN

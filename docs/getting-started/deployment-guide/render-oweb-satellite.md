@@ -151,16 +151,18 @@ Invite teammates via `/auth` ([Better Auth members guide](../setup-guide/members
 | Report runs RESTRICTED | Missing/invalid license | Add `LICENSE_KEY` for `PUBLIC_ORIGIN` |
 | Blank UI | `PUBLIC_ORIGIN` mismatch | Must exactly match the browser URL (scheme + host) |
 
-## One OS sign-in (preview)
+## One OS sign-in
 
 When One OS (Supabase) should own sign-in:
 
 1. Set `IDP_PROVIDER=one-os` and configure [`@owox/idp-one-os`](../../../packages/idp-one-os/README.md) variables.
-2. Set `IDP_ONE_OS_SIGN_IN_URL` to your One OS login page.
-3. Configure One OS to redirect after login to  
+2. Set `IDP_ONE_OS_SIGN_IN_URL` to your One OS login page (for Oweb production: `https://artemiis.one/login`).
+3. Set `IDP_ONE_OS_SUPABASE_URL` to the project auth URL (`https://auth.oweb.one` custom domain or `https://<ref>.supabase.co`).
+4. Configure One OS so that after login it honors `redirect_to` and sends the user to  
    `{PUBLIC_ORIGIN}/auth/one-os/callback?access_token=<supabase_access_token>`.
-4. Map workspaces: `IDP_ONE_OS_WORKSPACE_PROJECT_MAP='{"<workspace-uuid>":"0"}'`.
-5. Plan cutover from Better Auth (export users or re-invite).
+5. Map workspaces via `IDP_ONE_OS_WORKSPACE_PROJECT_MAP` or the Phase C activation API (`IDP_ONE_OS_ACTIVATION_SECRET`).
+6. Point `SQLITE_DB_PATH` and `IDP_ONE_OS_BINDINGS_FILE` at the Render disk mount (`/root/.local/share/owox/...`).
 
-Member invites and workspace activation UI remain Phase C — see
-[oweb-satellite-one-os.md](../../architecture/oweb-satellite-one-os.md).
+**oMetrics (Render):** `https://ometrics.onrender.com` redirects `/auth/sign-in` to Artemis with `redirect_to=https://ometrics.onrender.com/auth/one-os/callback`. Verify with `GET /api/flags` (`IDP_PROVIDER` should be `one-os`).
+
+Workspace activation API: [one-os-workspace-activation-spec.md](../../architecture/one-os-workspace-activation-spec.md). Architecture: [oweb-satellite-one-os.md](../../architecture/oweb-satellite-one-os.md).
