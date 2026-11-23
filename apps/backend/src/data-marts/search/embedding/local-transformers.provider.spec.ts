@@ -1,4 +1,8 @@
-import { LocalTransformersEmbeddingProvider } from './local-transformers.provider';
+import {
+  LOCAL_EMBEDDING_MIN_CONSTRAINED_BYTES,
+  LocalTransformersEmbeddingProvider,
+  localEmbeddingsFit,
+} from './local-transformers.provider';
 import { EMBEDDING_DIMENSIONS, EMBEDDING_DTYPE, EMBEDDING_MODEL } from './embedding-provider';
 import type { AdvancedSearchConfig } from '../config/advanced-search.config';
 
@@ -39,7 +43,38 @@ function buildProvider(
   return new LocalTransformersEmbeddingProvider(config, importer);
 }
 
+describe('localEmbeddingsFit', () => {
+  it('loads on an unconstrained host and skips a 512MB cgroup', () => {
+    expect(localEmbeddingsFit(undefined)).toBe(true);
+    expect(localEmbeddingsFit(0)).toBe(true);
+    expect(localEmbeddingsFit(512 * 1024 * 1024)).toBe(false);
+    expect(localEmbeddingsFit(LOCAL_EMBEDDING_MIN_CONSTRAINED_BYTES)).toBe(true);
+  });
+});
+
 describe('LocalTransformersEmbeddingProvider', () => {
+  describe('memory limit', () => {
+    it('does not load the local model when the process is limited to 512MB', async () => {
+      const memorySpy = jest
+        .spyOn(process, 'constrainedMemory')
+        .mockReturnValue(512 * 1024 * 1024);
+      const importer = jest.fn();
+      const provider = buildProvider(importer);
+      const warnSpy = jest.spyOn(provider['logger'], 'warn').mockImplementation(() => undefined);
+
+      try {
+        await expect(provider.embed(['hello'])).resolves.toEqual([null]);
+        await expect(provider.embed(['again'])).resolves.toEqual([null]);
+        expect(importer).not.toHaveBeenCalled();
+        expect(warnSpy).toHaveBeenCalledTimes(1);
+        expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('keyword matching'));
+      } finally {
+        memorySpy.mockRestore();
+        warnSpy.mockRestore();
+      }
+    });
+  });
+
   describe('import failure', () => {
     it('returns nulls for every text and retries loading on the next call', async () => {
       const fakeVec = new Float32Array(EMBEDDING_DIMENSIONS).fill(0.1);
